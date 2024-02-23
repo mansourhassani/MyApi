@@ -1,3 +1,5 @@
+using Data.Repositories;
+using Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MyApi.Controllers
@@ -6,13 +8,21 @@ namespace MyApi.Controllers
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
+
         private static readonly string[] Summaries = new[]
         {
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
 
         private readonly ILogger<WeatherForecastController> _logger;
+        private readonly UserRepository UserRepository;
+        private Repository<Category> CategoryRepository { get; }
 
+        public WeatherForecastController(UserRepository UserRepository, Repository<Category> CategoryRepository)
+        {
+            this.UserRepository = UserRepository;
+            this.CategoryRepository = CategoryRepository;
+        }
         public WeatherForecastController(ILogger<WeatherForecastController> logger)
         {
             _logger = logger;
