@@ -16,7 +16,7 @@ namespace Entities
 
         [Required]
         [StringLength(100)]
-        public string UserNamed { get; set; }
+        public string UserName { get; set; }
         [Required]
         [StringLength(500)]
         public string PasswordHash { get; set; }
@@ -26,9 +26,9 @@ namespace Entities
         public int Age { get; set; }
         public GenderType Gender { get; set; }
         public bool IsActive { get; set; }
-        public DateTimeOffset LastLoginDate { get; set; }
+        public DateTimeOffset? LastLoginDate { get; set; }
 
-        public ICollection<Post> Posts { get; set; }
+        public ICollection<Post>? Posts { get; set; }
 
     }
     public enum GenderType
