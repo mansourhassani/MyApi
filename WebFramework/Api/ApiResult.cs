@@ -1,5 +1,6 @@
 ﻿using Common.Utilities;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,7 @@ namespace WebFramework.Api
     {
         public Boolean IsSuccess { get; set; }
         public ApiResultStatusCode StatusCode { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string Message { get; set; }
 
         public ApiResult(bool isSuccess, ApiResultStatusCode statusCode, string message = null)
@@ -58,6 +60,7 @@ namespace WebFramework.Api
     public class ApiResult<TData> : ApiResult
         where TData : class
     {
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public TData Data { get; set; }
 
         public ApiResult(bool isSuccess, ApiResultStatusCode statusCode, TData data, string message = null)
