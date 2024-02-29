@@ -1,4 +1,5 @@
-﻿using Common.Utilities;
+﻿using Common.Exceptions;
+using Common.Utilities;
 using Data.Contracts;
 using Entities;
 using Microsoft.EntityFrameworkCore;
@@ -22,11 +23,15 @@ namespace Data.Repositories
             var PasswordHash = SecurityHelper.GetSha256Hash(password);
             return Table.Where(x => x.UserName == username && x.PasswordHash == PasswordHash).SingleOrDefaultAsync(cancellationToken);
         }
-        public Task AddAsync(User user, string password, CancellationToken cancellationToken)
+        public async Task AddAsync(User user, string password, CancellationToken cancellationToken)
         {
+            var exists = await TableNoTracking.AnyAsync(p => p.UserName == user.UserName);
+            if (exists)
+                throw new BadRequestException("نام کاربری تکراری است");
+
             var passwordHash = SecurityHelper.GetSha256Hash(password);
             user.PasswordHash = passwordHash;
-            return base.AddAsync(user, cancellationToken);
+            await base.AddAsync(user, cancellationToken);
         }
     }
 }

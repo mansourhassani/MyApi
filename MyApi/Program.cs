@@ -3,6 +3,7 @@ using Data.Contracts;
 using Data.Repositories;
 using Entities;
 using Microsoft.EntityFrameworkCore;
+using WebFramework.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+app.UseCustomExceptionHandler();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

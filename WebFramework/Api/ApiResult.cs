@@ -1,4 +1,5 @@
-﻿using Common.Utilities;
+﻿using Common;
+using Common.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;

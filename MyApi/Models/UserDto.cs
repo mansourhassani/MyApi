@@ -22,11 +22,11 @@ namespace MyApi.Models
         {
             var list = new List<ValidationResult>();
             if (UserName.Equals("test", StringComparison.OrdinalIgnoreCase))
-                yield return new ValidationResult("نام کاربری نمی تواند Test باشد.", new[] { nameof(UserName) });
+                yield return new ValidationResult("نام کاربری نمی تواند Test باشد", new[] { nameof(UserName) });
             if(Password.Equals("123456"))
-                yield return new ValidationResult("رمز عبور نمی تواند 123456 باشد.", new[] { nameof(Password) });
+                yield return new ValidationResult("رمز عبور نمی تواند 123456 باشد", new[] { nameof(Password) });
             if(Gender == GenderType.Male && Age > 30)
-                yield return new ValidationResult("آقایان بیشتر از 30 سال معتبر نیستند.", new[] { nameof(Gender), nameof(Age) });
+                yield return new ValidationResult("آقایان بیشتر از 30 سال معتبر نیستند", new[] { nameof(Gender), nameof(Age) });
         }
     }
 }
