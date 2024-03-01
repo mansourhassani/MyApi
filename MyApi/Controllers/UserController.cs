@@ -1,6 +1,8 @@
 ﻿using Data.Contracts;
 using Data.Repositories;
+using ElmahCore;
 using Entities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyApi.Models;
@@ -16,10 +18,12 @@ namespace MyApi.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserRepository userRepository;
+        private readonly ILogger<UserController> logger;
 
-        public UserController(IUserRepository userRepository)
+        public UserController(IUserRepository userRepository, ILogger<UserController> logger)
         {
             this.userRepository = userRepository;
+            this.logger = logger;
         }
 
         [HttpGet]
@@ -41,6 +45,8 @@ namespace MyApi.Controllers
         [HttpPost]
         public async Task<ApiResult<User>> Create(UserDto userDto, CancellationToken cancellationToken)
         {
+            //await HttpContext.RaiseError(new Exception("متد create فراخوانی شد1"));
+            logger.LogError("متد create فراخوانی شد2");
             var user = new User
             {
                 Age = userDto.Age,
