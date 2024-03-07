@@ -1,11 +1,17 @@
-﻿using Data.Contracts;
+﻿using Common;
+using Common.Exceptions;
+using Data.Contracts;
 using Data.Repositories;
 using ElmahCore;
 using Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyApi.Models;
+using Services.Services;
+using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading;
 using WebFramework.Api;
 using WebFramework.Filters;
@@ -14,21 +20,31 @@ namespace MyApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiResultFilter]
+    //[Authorize(Roles = "Admin")]
+    //[AllowAnonymous]
     [ApiController]
     public class UserController : ControllerBase
     {
         private readonly IUserRepository userRepository;
         private readonly ILogger<UserController> logger;
+        private readonly IJwtService jwtService;
 
-        public UserController(IUserRepository userRepository, ILogger<UserController> logger)
+        public UserController(IUserRepository userRepository, ILogger<UserController> logger, IJwtService jwtService)
         {
             this.userRepository = userRepository;
             this.logger = logger;
+            this.jwtService = jwtService;
         }
 
         [HttpGet]
         public async Task<ActionResult<List<User>>> Get(CancellationToken cancellationToken)
         {
+            var userName = HttpContext.User.Identity.GetUserName();
+            userName = HttpContext.User.Identity.Name;
+            var userIdInt = HttpContext.User.Identity.GetUserId<int>();
+            var phone = HttpContext.User.Identity.FindFirstValue(ClaimTypes.MobilePhone);
+            var role = HttpContext.User.Identity.FindFirstValue(ClaimTypes.Role);
+
             var users = await userRepository.TableNoTracking.ToListAsync(cancellationToken);
             return Ok(users);
         }
@@ -40,6 +56,18 @@ namespace MyApi.Controllers
             if (user == null)
                 return NotFound();
             return user;
+        }
+
+        [HttpGet("[action]")]
+        [AllowAnonymous]
+        public async Task<string> Token(string username, string password, CancellationToken cancellationToken)
+        {
+            var user = await userRepository.GetByUserAndPass(username, password, cancellationToken);
+            if(user == null)
+                throw new BadRequestException("نان کاربری یا رمز عبور اشتباه است");
+
+            var jwt = jwtService.Generate(user);
+            return jwt;
         }
 
         [HttpPost]

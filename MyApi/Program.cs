@@ -1,3 +1,5 @@
+using Autofac.Core;
+using Common;
 using Data;
 using Data.Contracts;
 using Data.Repositories;
@@ -7,12 +9,17 @@ using Entities;
 using Microsoft.EntityFrameworkCore;
 using NLog;
 using NLog.Web;
+using Services.Services;
 using System.Net;
+using WebFramework.Configuration;
 using WebFramework.Middlewares;
 
 var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
 
 var builder = WebApplication.CreateBuilder(args);
+
+var _siteSetting = new SiteSettings();
+builder.Configuration.GetSection("SiteSettings").Bind(_siteSetting);
 
 // Add services to the container.
 
@@ -27,13 +34,22 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer"));
 });
+builder.Services.Configure<SiteSettings>(builder.Configuration.GetSection(nameof(SiteSettings)));
+
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IJwtService, JwtService>();
+
+builder.Services.AddJwtAuthentication(_siteSetting.JwtSetting);
 
 //builder.Services.AddElmah<SqlErrorLog>(options =>
 //{
-//    options.Path = "/elmah";
+//    options.Path = _siteSetting.ElmahPath;
 //    options.ConnectionString = builder.Configuration.GetConnectionString("Elmah");
+//    options.OnPermissionCheck = httpcontext =>
+//    {
+//        return true;
+//    };
 //});
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -55,9 +71,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
+
 app.UseAuthorization();
 
-app.MapControllers();
+app.MapControllers().RequireAuthorization();
 
 app.Run();
 
