@@ -1,5 +1,6 @@
 ﻿using Common;
 using Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -21,18 +22,22 @@ namespace Services.Services
         }
         public string Generate(User user)
         {
-            var secretKey = Encoding.UTF8.GetBytes(_siteSettings.JwtSetting.SecretKey); // longer that 16 character
+            var secretKey = Encoding.UTF8.GetBytes(_siteSettings.JwtSettings.SecretKey); // longer that 16 character
             var signingCredentials = new SigningCredentials(new SymmetricSecurityKey(secretKey), SecurityAlgorithms.HmacSha256);
+
+            var encryptionkey = Encoding.UTF8.GetBytes(_siteSettings.JwtSettings.EncryptKey); //must be 16 character
+            var encryptingCredentials = new EncryptingCredentials(new SymmetricSecurityKey(encryptionkey), SecurityAlgorithms.Aes128KW, SecurityAlgorithms.Aes128CbcHmacSha256);
 
             var claims = _getClaims(user);
             var descriptor = new SecurityTokenDescriptor
             {
-                Issuer = _siteSettings.JwtSetting.Issuer,
-                Audience = _siteSettings.JwtSetting.Audience,
+                Issuer = _siteSettings.JwtSettings.Issuer,
+                Audience = _siteSettings.JwtSettings.Audience,
                 IssuedAt = DateTime.Now,
-                NotBefore = DateTime.Now.AddMinutes(_siteSettings.JwtSetting.NotBeforeMinutes),
-                Expires = DateTime.Now.AddMinutes(_siteSettings.JwtSetting.ExpirationMinutes),
+                NotBefore = DateTime.Now.AddMinutes(_siteSettings.JwtSettings.NotBeforeMinutes),
+                Expires = DateTime.Now.AddMinutes(_siteSettings.JwtSettings.ExpirationMinutes),
                 SigningCredentials = signingCredentials,
+                EncryptingCredentials = encryptingCredentials,
                 Subject = new ClaimsIdentity(claims)
             };
 
@@ -49,18 +54,18 @@ namespace Services.Services
 
         private IEnumerable<Claim> _getClaims(User user)
         {
+            var SecurityStampClaimType = new ClaimsIdentityOptions().SecurityStampClaimType;
             var list = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.MobilePhone, "09994568763")
+                new Claim(ClaimTypes.MobilePhone, "09994568763"),
+                new Claim(SecurityStampClaimType, user.SecurityStamp.ToString())
             };
 
             var roles = new Role[] { new Role { Name = "Admin" } };
             foreach (var role in roles)
-            {
                 list.Add(new Claim(ClaimTypes.Role, role.Name));
-            }
 
             return list;
         }

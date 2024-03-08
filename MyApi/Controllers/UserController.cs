@@ -50,11 +50,14 @@ namespace MyApi.Controllers
         }
 
         [HttpGet("{id:int}")]
+        [AllowAnonymous]
         public async Task<ApiResult<User>> Get(int id, CancellationToken cancellationToken)
         {
             var user = await userRepository.GetByIdAsync(cancellationToken, id);
             if (user == null)
                 return NotFound();
+
+            await userRepository.UpdateSecurityStampAsync(user, cancellationToken);
             return user;
         }
 

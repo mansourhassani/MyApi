@@ -18,8 +18,8 @@ var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentCla
 
 var builder = WebApplication.CreateBuilder(args);
 
-var _siteSetting = new SiteSettings();
-builder.Configuration.GetSection("SiteSettings").Bind(_siteSetting);
+var _siteSettings = new SiteSettings();
+builder.Configuration.GetSection("SiteSettings").Bind(_siteSettings);
 
 // Add services to the container.
 
@@ -40,7 +40,7 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 
-builder.Services.AddJwtAuthentication(_siteSetting.JwtSetting);
+builder.Services.AddJwtAuthentication(_siteSettings.JwtSettings);
 
 //builder.Services.AddElmah<SqlErrorLog>(options =>
 //{
