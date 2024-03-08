@@ -26,61 +26,62 @@ builder.Configuration.GetSection("SiteSettings").Bind(_siteSettings);
 try
 {
 
-builder.Logging.ClearProviders();
-builder.Host.UseNLog();
+    builder.Logging.ClearProviders();
+    builder.Host.UseNLog();
 
-builder.Services.AddControllers();
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer"));
-});
-builder.Services.Configure<SiteSettings>(builder.Configuration.GetSection(nameof(SiteSettings)));
+    builder.Services.AddControllers();
+    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    {
+        options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer"));
+    });
+    builder.Services.Configure<SiteSettings>(builder.Configuration.GetSection(nameof(SiteSettings)));
 
-builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IJwtService, JwtService>();
+    builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+    builder.Services.AddScoped<IUserRepository, UserRepository>();
+    builder.Services.AddScoped<IJwtService, JwtService>();
 
-builder.Services.AddJwtAuthentication(_siteSettings.JwtSettings);
+    builder.Services.AddCustomIdentity(_siteSettings.IdentitySettings);
+    builder.Services.AddJwtAuthentication(_siteSettings.JwtSettings);
 
-//builder.Services.AddElmah<SqlErrorLog>(options =>
-//{
-//    options.Path = _siteSetting.ElmahPath;
-//    options.ConnectionString = builder.Configuration.GetConnectionString("Elmah");
-//    options.OnPermissionCheck = httpcontext =>
-//    {
-//        return true;
-//    };
-//});
+    //builder.Services.AddElmah<SqlErrorLog>(options =>
+    //{
+    //    options.Path = _siteSetting.ElmahPath;
+    //    options.ConnectionString = builder.Configuration.GetConnectionString("Elmah");
+    //    options.OnPermissionCheck = httpcontext =>
+    //    {
+    //        return true;
+    //    };
+    //});
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+    // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerGen();
 
-var app = builder.Build();
+    var app = builder.Build();
 
-app.UseCustomExceptionHandler();
+    app.UseCustomExceptionHandler();
 
-//app.UseElmah();
+    //app.UseElmah();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    // Configure the HTTP request pipeline.
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI();
+    }
+
+    app.UseHttpsRedirection();
+
+    app.UseAuthentication();
+
+    app.UseAuthorization();
+
+    app.MapControllers().RequireAuthorization();
+
+    app.Run();
+
 }
-
-app.UseHttpsRedirection();
-
-app.UseAuthentication();
-
-app.UseAuthorization();
-
-app.MapControllers().RequireAuthorization();
-
-app.Run();
-
-}
-catch(Exception ex)
+catch (Exception ex)
 {
     logger.Error(ex);
 }

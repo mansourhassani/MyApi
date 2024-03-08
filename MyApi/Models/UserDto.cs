@@ -16,6 +16,7 @@ namespace MyApi.Models
         public string FullName { get; set; }
         public int Age { get; set; }
         public GenderType Gender { get; set; }
+        public string Email { get; set; }
         public bool IsActive { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
