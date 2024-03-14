@@ -15,11 +15,37 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Common.Utilities;
+using Microsoft.Extensions.Configuration;
+using Data;
+using Microsoft.EntityFrameworkCore;
+using ElmahCore.Mvc;
+using ElmahCore.Sql;
 
 namespace WebFramework.Configuration
 {
     public static class ServiceCollectionExtensions
     {
+        public static void AddDbContext(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddDbContext<ApplicationDbContext>(options =>
+            {
+                options.UseSqlServer(configuration.GetConnectionString("SqlServer"));
+            });
+        }
+
+        public static void AddElmah(this IServiceCollection services, IConfiguration configuration, SiteSettings siteSettings)
+        {
+            services.AddElmah<SqlErrorLog>(options =>
+            {
+                options.Path = siteSettings.ElmahPath;
+                options.ConnectionString = configuration.GetConnectionString("Elmah");
+                options.OnPermissionCheck = httpcontext =>
+                {
+                    return true;
+                };
+            });
+        }
+
         public static void AddJwtAuthentication(this IServiceCollection services, JwtSettings jwtSettings)
         {
             services.AddAuthentication(options =>

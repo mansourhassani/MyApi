@@ -1,4 +1,6 @@
+using Autofac;
 using Autofac.Core;
+using Autofac.Extensions.DependencyInjection;
 using Common;
 using Data;
 using Data.Contracts;
@@ -18,6 +20,8 @@ var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentCla
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
+
 var _siteSettings = new SiteSettings();
 builder.Configuration.GetSection("SiteSettings").Bind(_siteSettings);
 
@@ -29,29 +33,24 @@ try
     builder.Logging.ClearProviders();
     builder.Host.UseNLog();
 
+    //Register services
     builder.Services.AddControllers();
-    builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    {
-        options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer"));
-    });
+    builder.Services.AddDbContext(builder.Configuration);
     builder.Services.Configure<SiteSettings>(builder.Configuration.GetSection(nameof(SiteSettings)));
 
-    builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-    builder.Services.AddScoped<IUserRepository, UserRepository>();
-    builder.Services.AddScoped<IJwtService, JwtService>();
+    //Register dependency Injection services
+    builder.Host
+    .UseServiceProviderFactory(new AutofacServiceProviderFactory())
+    .ConfigureContainer<ContainerBuilder>((container) =>
+    {
+        container.AddServices();
+    });
 
+    //Register Authentication services
     builder.Services.AddCustomIdentity(_siteSettings.IdentitySettings);
     builder.Services.AddJwtAuthentication(_siteSettings.JwtSettings);
 
-    //builder.Services.AddElmah<SqlErrorLog>(options =>
-    //{
-    //    options.Path = _siteSetting.ElmahPath;
-    //    options.ConnectionString = builder.Configuration.GetConnectionString("Elmah");
-    //    options.OnPermissionCheck = httpcontext =>
-    //    {
-    //        return true;
-    //    };
-    //});
+    //builder.Services.AddElmah(builder.Configuration, _siteSettings);
 
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     builder.Services.AddEndpointsApiExplorer();
