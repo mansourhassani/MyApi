@@ -1,6 +1,7 @@
 using Autofac;
 using Autofac.Core;
 using Autofac.Extensions.DependencyInjection;
+using AutoMapper;
 using Common;
 using Data;
 using Data.Contracts;
@@ -9,6 +10,8 @@ using ElmahCore.Mvc;
 using ElmahCore.Sql;
 using Entities;
 using Microsoft.EntityFrameworkCore;
+using MyApi;
+using MyApi.Models;
 using NLog;
 using NLog.Web;
 using Services.Services;
@@ -49,6 +52,7 @@ try
     //Register Authentication services
     builder.Services.AddCustomIdentity(_siteSettings.IdentitySettings);
     builder.Services.AddJwtAuthentication(_siteSettings.JwtSettings);
+    builder.Services.AddAutoMapper(typeof(Program));
 
     //builder.Services.AddElmah(builder.Configuration, _siteSettings);
 

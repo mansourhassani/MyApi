@@ -24,16 +24,16 @@ namespace MyApi.Controllers
     //[Authorize(AuthenticationSchemes = "Bearer")]
     //[AllowAnonymous]
     [ApiController]
-    public class UserController : ControllerBase
+    public class UsersController : ControllerBase
     {
         private readonly IUserRepository userRepository;
-        private readonly ILogger<UserController> logger;
+        private readonly ILogger<UsersController> logger;
         private readonly IJwtService jwtService;
         private readonly UserManager<User> userManager;
         private readonly RoleManager<Role> roleManager;
         private readonly SignInManager<User> signInManager;
 
-        public UserController(IUserRepository userRepository, ILogger<UserController> logger, IJwtService jwtService,
+        public UsersController(IUserRepository userRepository, ILogger<UsersController> logger, IJwtService jwtService,
             UserManager<User> userManager, RoleManager<Role> roleManager, SignInManager<User> signInManager)
         {
             this.userRepository = userRepository;
