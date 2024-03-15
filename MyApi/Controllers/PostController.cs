@@ -62,6 +62,9 @@ namespace MyApi.Controllers
             var dto = await _repository.TableNoTracking.ProjectTo<PostDto>(mapper.ConfigurationProvider)
                 .SingleOrDefaultAsync(p => p.Id == id ,cancellationToken);
 
+            //Post post = null; //Find from database by Id(include)
+            //var resultDto = PostDto.FromEntity(mapper, post);
+
             if (dto == null)
                 return NotFound();
 
@@ -84,7 +87,8 @@ namespace MyApi.Controllers
         [HttpPost]
         public async Task<ApiResult<PostDto>> Create(PostDto dto, CancellationToken cancellationToken)
         {
-            var model = mapper.Map<Post>(dto);
+            //var model = mapper.Map<Post>(dto);
+            var model = dto.ToEntity(mapper);
 
             #region Old code
             //var model = new Post
@@ -130,7 +134,7 @@ namespace MyApi.Controllers
             #endregion
 
             var resultDto = await _repository.TableNoTracking.ProjectTo<PostDto>(mapper.ConfigurationProvider)
-                .SingleOrDefaultAsync(cancellationToken);
+                .SingleOrDefaultAsync(p => p.Id == model.Id ,cancellationToken);
             
             return resultDto;
         }
@@ -144,9 +148,19 @@ namespace MyApi.Controllers
         [HttpPut]
         public async Task<ApiResult<PostDto>> Update(Guid id, PostDto dto, CancellationToken cancellationToken)
         {
+            //var postDto = new PostDto();
+            //Create
+            //var post = postDto.ToEntity(mapper); // DTO => Entity
+            //Update
+            //var updatePost = postDto.ToEntity(mapper, model);  // DTO => Entity (an exist)
+            //GetById
+            //var postDto = PostDto.FromEntity(mapper, model); // Entity => DTO
+
             var model = await _repository.GetByIdAsync(cancellationToken, id);
 
-            mapper.Map(dto, model);
+            //mapper.Map(dto, model);
+            dto.ToEntity(mapper, model);
+
             #region Old code
             //model.Title = dto.Title;
             //model.Description = dto.Description;
@@ -170,7 +184,7 @@ namespace MyApi.Controllers
             #endregion
 
             var resultDto = await _repository.TableNoTracking.ProjectTo<PostDto>(mapper.ConfigurationProvider)
-                .SingleOrDefaultAsync(cancellationToken);
+                .SingleOrDefaultAsync(p => p.Id == model.Id, cancellationToken);
 
             return resultDto;
         }

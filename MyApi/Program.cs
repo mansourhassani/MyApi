@@ -17,6 +17,7 @@ using NLog.Web;
 using Services.Services;
 using System.Net;
 using WebFramework.Configuration;
+using WebFramework.CustomMapping;
 using WebFramework.Middlewares;
 
 var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
@@ -52,8 +53,8 @@ try
     //Register Authentication services
     builder.Services.AddCustomIdentity(_siteSettings.IdentitySettings);
     builder.Services.AddJwtAuthentication(_siteSettings.JwtSettings);
-    builder.Services.AddAutoMapper(typeof(Program));
 
+    AutoMapperConfiguration.InitializeAutoMapper(builder.Services ,typeof(Program).Assembly);
     //builder.Services.AddElmah(builder.Configuration, _siteSettings);
 
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
