@@ -22,6 +22,14 @@ namespace WebFramework.Api
             return mapper.Map(CastToDerivedClass(mapper, this), entity);
         }
 
+        public TEntity ToEntityForUpdate(IMapper mapper, TEntity entity)
+        {
+            var id = entity.Id;
+            var result = mapper.Map(CastToDerivedClass(mapper, this), entity);
+            result.Id = id;
+            return result;
+        }
+
         public static TDto FromEntity(IMapper mapper, TEntity model)
         {
             return mapper.Map<TDto>(model);
