@@ -5,11 +5,11 @@ using Microsoft.AspNetCore.Mvc;
 using MyApi.Models;
 using WebFramework.Api;
 
-namespace MyApi.Controllers
+namespace MyApi.Controllers.v1
 {
-    public class PostsController : CrudController<PostDto, PostSelectDto, Post, Guid>
+    public class CategoriesController : CrudController<CategoryDto, Category>
     {
-        public PostsController(IRepository<Post> repository, IMapper mapper) 
+        public CategoriesController(IRepository<Category> repository, IMapper mapper)
             : base(repository, mapper)
         {
         }

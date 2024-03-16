@@ -8,6 +8,6 @@ namespace MyApi.Models
     {
         public string Name { get; set; }
         public int? ParentCategoryId { get; set; }
-        public int? ParentCategoryName { get; set; } //=> mapped from ParentCategory.Name
+        public string? ParentCategoryName { get; set; } //=> mapped from ParentCategory.Name
     }
 }

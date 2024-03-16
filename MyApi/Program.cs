@@ -56,6 +56,7 @@ try
 
     AutoMapperConfiguration.InitializeAutoMapper(builder.Services ,typeof(Program).Assembly);
     //builder.Services.AddElmah(builder.Configuration, _siteSettings);
+    builder.Services.AddCustomApiVersioning();
 
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     builder.Services.AddEndpointsApiExplorer();

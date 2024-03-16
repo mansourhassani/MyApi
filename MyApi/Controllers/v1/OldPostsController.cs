@@ -9,13 +9,9 @@ using MyApi.Models;
 using WebFramework.Api;
 using WebFramework.Filters;
 
-namespace MyApi.Controllers
+namespace MyApi.Controllers.v1
 {
-    [ApiController]
-    [AllowAnonymous]
-    [ApiResultFilter]
-    [Route("api/[controller]")]
-    public class OldPostsController : ControllerBase
+    public class OldPostsController : BaseController
     {
         private readonly IRepository<Post> _repository;
         private readonly IMapper mapper;
@@ -60,7 +56,7 @@ namespace MyApi.Controllers
         public async Task<ApiResult<PostSelectDto>> Get(Guid id, CancellationToken cancellationToken)
         {
             var dto = await _repository.TableNoTracking.ProjectTo<PostSelectDto>(mapper.ConfigurationProvider)
-                .SingleOrDefaultAsync(p => p.Id == id ,cancellationToken);
+                .SingleOrDefaultAsync(p => p.Id == id, cancellationToken);
 
             //Post post = null; //Find from database by Id(include)
             //var resultDto = PostDto.FromEntity(mapper, post);
@@ -134,8 +130,8 @@ namespace MyApi.Controllers
             #endregion
 
             var resultDto = await _repository.TableNoTracking.ProjectTo<PostSelectDto>(mapper.ConfigurationProvider)
-                .SingleOrDefaultAsync(p => p.Id == model.Id ,cancellationToken);
-            
+                .SingleOrDefaultAsync(p => p.Id == model.Id, cancellationToken);
+
             return resultDto;
         }
 

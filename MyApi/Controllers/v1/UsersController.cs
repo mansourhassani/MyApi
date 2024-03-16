@@ -17,14 +17,9 @@ using System.Threading;
 using WebFramework.Api;
 using WebFramework.Filters;
 
-namespace MyApi.Controllers
+namespace MyApi.Controllers.v1
 {
-    [Route("api/[controller]")]
-    [ApiResultFilter]
-    //[Authorize(AuthenticationSchemes = "Bearer")]
-    //[AllowAnonymous]
-    [ApiController]
-    public class UsersController : ControllerBase
+    public class UsersController : BaseController
     {
         private readonly IUserRepository userRepository;
         private readonly ILogger<UsersController> logger;
@@ -45,7 +40,7 @@ namespace MyApi.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<User>>> Get(CancellationToken cancellationToken)
+        public virtual async Task<ActionResult<List<User>>> Get(CancellationToken cancellationToken)
         {
             //var userName = HttpContext.User.Identity.GetUserName();
             //userName = HttpContext.User.Identity.Name;
@@ -59,8 +54,8 @@ namespace MyApi.Controllers
 
         [HttpGet("{id:int}")]
         //[AllowAnonymous]
-        
-        public async Task<ApiResult<User>> Get(int id, CancellationToken cancellationToken)
+
+        public virtual async Task<ApiResult<User>> Get(int id, CancellationToken cancellationToken)
         {
             var user2 = await userManager.FindByIdAsync(id.ToString());
             var role = roleManager.FindByNameAsync("Admin");
@@ -75,7 +70,7 @@ namespace MyApi.Controllers
 
         [HttpGet("[action]")]
         [AllowAnonymous]
-        public async Task<string> Token(string username, string password, CancellationToken cancellationToken)
+        public virtual async Task<string> Token(string username, string password, CancellationToken cancellationToken)
         {
             //var user = await userRepository.GetByUserAndPass(username, password, cancellationToken);
             var user = await userManager.FindByNameAsync(username);
@@ -83,7 +78,7 @@ namespace MyApi.Controllers
                 throw new BadRequestException("نان کاربری یا رمز عبور اشتباه است");
 
             var isPasswordValid = await userManager.CheckPasswordAsync(user, password);
-            if(!isPasswordValid)
+            if (!isPasswordValid)
                 throw new BadRequestException("نان کاربری یا رمز عبور اشتباه است");
 
             await userManager.UpdateSecurityStampAsync(user);
@@ -94,7 +89,7 @@ namespace MyApi.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<ApiResult<User>> Create(UserDto userDto, CancellationToken cancellationToken)
+        public virtual async Task<ApiResult<User>> Create(UserDto userDto, CancellationToken cancellationToken)
         {
             //await HttpContext.RaiseError(new Exception("متد create فراخوانی شد1"));
             logger.LogError("متد create فراخوانی شد2");
@@ -121,7 +116,7 @@ namespace MyApi.Controllers
         }
 
         [HttpPut]
-        public async Task<ApiResult> Update(int id, User user, CancellationToken cancellationToken)
+        public virtual async Task<ApiResult> Update(int id, User user, CancellationToken cancellationToken)
         {
             var updateUser = await userRepository.GetByIdAsync(cancellationToken, id);
 
@@ -138,7 +133,7 @@ namespace MyApi.Controllers
         }
 
         [HttpDelete]
-        public async Task<ApiResult> Delete(int id, CancellationToken cancellationToken)
+        public virtual async Task<ApiResult> Delete(int id, CancellationToken cancellationToken)
         {
             var user = await userRepository.GetByIdAsync(CancellationToken.None, id);
             await userRepository.DeleteAsync(user, cancellationToken);

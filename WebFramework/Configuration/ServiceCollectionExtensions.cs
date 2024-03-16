@@ -20,6 +20,8 @@ using Data;
 using Microsoft.EntityFrameworkCore;
 using ElmahCore.Mvc;
 using ElmahCore.Sql;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
 
 namespace WebFramework.Configuration
 {
@@ -134,6 +136,36 @@ namespace WebFramework.Configuration
                         //return Task.CompletedTask;
                     }
                 };
+            });
+        }
+
+        public static void AddCustomApiVersioning(this IServiceCollection services)
+        {
+            services.AddApiVersioning(option =>
+            {
+                option.AssumeDefaultVersionWhenUnspecified = true; //default => false;
+                option.DefaultApiVersion = new ApiVersion(1, 0); //v1.0 == v1
+                option.ReportApiVersions = true;
+
+                ApiVersion.TryParse("1.0", out var version10);
+                ApiVersion.TryParse("1", out var version1);
+                var VersionsStatus = version10 == version1;
+
+                //option.ApiVersionReader = new QueryStringApiVersionReader("api-version");
+                // api/posts?api-version=1 
+
+                //option.ApiVersionReader = new UrlSegmentApiVersionReader();
+                // api/v1/posts
+
+                //option.ApiVersionReader = new HeaderApiVersionReader(new[] { "Api-Version" });
+                // header => Api-Version : 1
+
+                //option.ApiVersionReader = new MediaTypeApiVersionReader();
+
+                //option.ApiVersionReader = ApiVersionReader.Combine(
+                //    new QueryStringApiVersionReader("api-version"),
+                //    new UrlSegmentApiVersionReader());
+                // combine of [querystring] & [urlsegment]
             });
         }
     }
