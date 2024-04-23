@@ -11,9 +11,8 @@ using WebFramework.Filters;
 namespace WebFramework.Api
 {
     [ApiController]
-    //[AllowAnonymous]
+    [AllowAnonymous]
     [ApiResultFilter]
-    //[ApiVersion("1")] // api/v1/posts
     [Route("api/v{version:apiVersion}/[controller]")]// api/v1/[controller]
     public class BaseController : ControllerBase
     {

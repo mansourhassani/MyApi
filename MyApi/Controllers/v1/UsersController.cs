@@ -19,6 +19,7 @@ using WebFramework.Filters;
 
 namespace MyApi.Controllers.v1
 {
+    [ApiVersion("1")]
     public class UsersController : BaseController
     {
         private readonly IUserRepository userRepository;
@@ -68,6 +69,15 @@ namespace MyApi.Controllers.v1
             return user;
         }
 
+
+        /// <summary>
+        /// This method generate jwt token
+        /// </summary>
+        /// <param name="username">The UserName of User</param>
+        /// <param name="password">The Password of User</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        /// <exception cref="BadRequestException"></exception>
         [HttpGet("[action]")]
         [AllowAnonymous]
         public virtual async Task<string> Token(string username, string password, CancellationToken cancellationToken)

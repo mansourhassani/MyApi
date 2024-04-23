@@ -10,6 +10,8 @@ using ElmahCore.Mvc;
 using ElmahCore.Sql;
 using Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
 using MyApi;
 using MyApi.Models;
 using NLog;
@@ -19,6 +21,7 @@ using System.Net;
 using WebFramework.Configuration;
 using WebFramework.CustomMapping;
 using WebFramework.Middlewares;
+using WebFramework.Swagger;
 
 var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
 
@@ -60,7 +63,7 @@ try
 
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     builder.Services.AddEndpointsApiExplorer();
-    builder.Services.AddSwaggerGen();
+    builder.Services.AddSwagger();
 
     var app = builder.Build();
 
@@ -69,11 +72,7 @@ try
     //app.UseElmah();
 
     // Configure the HTTP request pipeline.
-    if (app.Environment.IsDevelopment())
-    {
-        app.UseSwagger();
-        app.UseSwaggerUI();
-    }
+    app.UseSwaggerAndUI();
 
     app.UseHttpsRedirection();
 

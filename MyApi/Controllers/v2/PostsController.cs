@@ -48,5 +48,15 @@ namespace MyApi.Controllers.v2
         {
             return Content("This is test");
         }
+
+        public override Task<ApiResult<PostSelectDto>> Create(PostDto dto, CancellationToken cancellationToken)
+        {
+            return base.Create(dto, cancellationToken);
+        }
+
+        public override Task<ApiResult<PostSelectDto>> Update(Guid id, PostDto dto, CancellationToken cancellationToken)
+        {
+            return base.Update(id, dto, cancellationToken);
+        }
     }
 }
